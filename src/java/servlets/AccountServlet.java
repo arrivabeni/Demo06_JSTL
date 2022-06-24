@@ -23,10 +23,10 @@ import models.User;
 public class AccountServlet extends HttpServlet {
 
     private final int PAGE_SIZE = 10;
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        
+
         String username = request.getParameter("username");
         if (username != null && !username.isEmpty()) {
             // give the user info on one user
@@ -36,18 +36,19 @@ public class AccountServlet extends HttpServlet {
             displayAllUsers(request, response);
         }
     }
-    
+
     private void displayAllUsers(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ArrayList<User> accounts = null;
         int page = 1;
-        
+
         try {
             page = Integer.parseInt(request.getParameter("page"));
         } catch (Exception ex) {
             // not necessary to log exception since it is not important
         }
-        
-        AccountService accountService = new AccountService(getServletContext().getRealPath("/WEB-INF/"));
+
+        String path = getServletContext().getRealPath("/WEB-INF/");
+        AccountService accountService = new AccountService(path);
         try {
             accounts = (ArrayList<User>) accountService.getAccounts(page, PAGE_SIZE);
         } catch (Exception ex) {
@@ -58,14 +59,15 @@ public class AccountServlet extends HttpServlet {
         request.setAttribute("page", page);
         getServletContext().getRequestDispatcher("/WEB-INF/accounts.jsp").forward(request, response);
     }
-    
+
     public void displayUserInfo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         User user = null;
-        
+
         try {
             String username = request.getParameter("username");
-            AccountService userService = new AccountService(getServletContext().getRealPath("/WEB-INF/"));
-            
+            String path = getServletContext().getRealPath("/WEB-INF/");
+            AccountService userService = new AccountService(path);
+
             user = userService.getAccount(username);
         } catch (Exception ex) {
             // serious exception, log it
@@ -75,7 +77,7 @@ public class AccountServlet extends HttpServlet {
         request.setAttribute("account", user);
         getServletContext().getRequestDispatcher("/WEB-INF/account.jsp").forward(request, response);
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
